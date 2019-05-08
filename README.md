@@ -2,18 +2,7 @@
 
 These capacitive touch detection library is an extension of the Arduino capacitive touch library, it offers two detection algorithms that solves two of the main problems associated with detecting capacitive touch on the Arduino. The library also allows advanced touch detections; such as, Double tap, Short press and Long press. Also featured in the library is a haptics controller, this allows you to connect and control a vibration motor as a feedback when you interact with the capacitive touch surface.
 
-#include <AdvCapTouch.h>
-
-AdvCapTouch samplepad  = AdvCapTouch();  //create a new captouch object
-int touchtype;
-
-void setup() {
-  samplepad.set_inputTypeThresholds(20, 40, 70, 150); // set the thresholds for the four input types  (singletap, shortpress, longpress, doubletapspeed)
-  samplepad.set_detectionThreshold(400, 100);  //set touch sensitivity in the form of detection, rejection thresholds values
-  samplepad.set_capTouchPins(3,4,0,0,0);   //set arduino pins associated with the pads (sendpin, receivepin1, receivepin2, receivepin3, receivepin4) this example uses just one pad.
-  samplepad.initialize_capTouch(1);
-  samplepad.set_haptics(6,40,255);  //set haptic feedback variables (arduino pwm pin, duration of haptics(ms), pwn strength from 0-255)
-}
+<script src="https://gist.github.com/ahmsville/5ade8dee2795402d2df029cbc7025fa4.js"></script>
 
 The code snippet above shows how you would typically setup the library.
 Line 2 is used to create a new capacitive touch object; the object is named “samplepad” but you can give any other name.
@@ -25,10 +14,7 @@ Line five is optional, only use this function when you have a haptics circuit se
 
 Detecting touch in the main program loop.
 
-void loop() {
-touchtype = samplepad.detect_touch(0);  //function return 1-4 based on the input detected, 1 = singletap, 2 = doubletap, 3 = shortpress, 4 = longpress
-samplepad.update_basevalue(0);
-}
+<script src="https://gist.github.com/ahmsville/e0f717f0b333d5f237a9b9ff3b2b2016.js"></script>
 
 There are two main functions for running the touch detection algorithm, the first is the detect_touch() function. This function should be used for a low noise touch setup, the function will return an integer value from 0 – 4.
 •	0 means no touch was detected.
