@@ -2,7 +2,7 @@
 
 These capacitive touch detection library is an extension of the Arduino capacitive touch library, it offers two detection algorithms that solves two of the main problems associated with detecting capacitive touch on the Arduino. The library also allows advanced touch detections; such as, Double tap, Short press and Long press. Also featured in the library is a haptics controller, this allows you to connect and control a vibration motor as a feedback when you interact with the capacitive touch surface.
 
-```
+```C
 #include <AdvCapTouch.h>
 
 AdvCapTouch samplepad  = AdvCapTouch();  //create a new captouch object
@@ -26,9 +26,15 @@ Line three is used to configure the Arduino pins connected to the resistor and t
 Line four is used to initialize the capacitive touch, the function initialize_capTouch() accepts an integer from 1 – 4, representing the number of pads your working with.
 Line five is optional, only use this function when you have a haptics circuit setup.
 
-Detecting touch in the main program loop.
+# Detecting touch in the main program loop.
 
-<script src="https://gist.github.com/ahmsville/e0f717f0b333d5f237a9b9ff3b2b2016.js"></script>
+```C
+void loop() {
+touchtype = samplepad.detect_touch(0);  //function return 1-4 based on the input detected, 1 = singletap, 2 = doubletap, 3 = shortpress, 4 = longpress
+Serial.println(touchtype);
+  samplepad.update_basevalue(0);
+}
+```
 
 There are two main functions for running the touch detection algorithm, the first is the detect_touch() function. This function should be used for a low noise touch setup, the function will return an integer value from 0 – 4.
 •	0 means no touch was detected.
