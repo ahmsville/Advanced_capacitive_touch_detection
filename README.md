@@ -37,11 +37,17 @@ Serial.println(touchtype);
 ```
 
 There are two main functions for running the touch detection algorithm, the first is the detect_touch() function. This function should be used for a low noise touch setup, the function will return an integer value from 0 – 4.
+
  •	0 means no touch was detected.
+ 
  •	1 means a single tap was detected.
+ 
  •	2 means a double tap was detected.
+ 
  •	3 means a short press was detected.
+ 
  •	4 means a long press was detected.
+ 
 The function detect_touch() should always be called with a integer value from 0 – 3, this value represents the position of the capacitive touch pad you want to run a touch detection on.
 For noisy touch setups, use the detect_touchFromNoise() function instead, this function is more reliable and works in the exact same way as detect_touch(). Because this algorithm involves signal sampling, it is just a little bit slower than the alternative.
 The second function update_basevalue() in the loop is used to continuously update the nominal value of the touch pad. This function is integral to making the touch detection adaptable across various touch conditions.
