@@ -3,13 +3,13 @@
 
 /*
 These capacitive touch detection library is written as an extension of the Arduino capacitive touch
-library, it offers two detection algorithms that solves two of the main problems that occurs when
+library, it offers two detection algorithms that solves two of the main problems associated with
 detecting capacitive touch on the Arduino.The library also allows advance touch detections; such
 as, Double tap, Short press and Long press.Also featured in the library is a haptics controller, this
 allow you to connect and control a vibration motor as a feedback when you interact with the
 capacitive touch surface.
 
-....Written By Ahmed Oyenuga (Ahmsville 2019).
+.... By Ahmed Oyenuga (Ahmsville 2019).
 */
 
 
@@ -29,65 +29,103 @@ void AdvCapTouch::initialize_capTouch(int numofpads) {
 	for (int i = 0; i < numofpads; i++) {
 		pinMode(receivepin[i], INPUT);
 	}
+
+	int pad, temp;
+	double testvalues[averagingValue];
+
+	int hapticsdurationtemp = haptics_duration;
+	int hapticsstrengthtemp = haptics_strength;
+	set_haptics(haptics_pin, 100, 127);
+
 	if (numofpads == 1) {
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad0.capacitiveSensor(30);
-			basevalue[0] += (testvalue / averagingValue);
-			delay(1);
+		pad = 0;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0){
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
 	}
 	else if (numofpads == 2) {
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad0.capacitiveSensor(30);
-			basevalue[0] += (testvalue / averagingValue);
-			delay(1);
+		pad = 0;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad1.capacitiveSensor(30);
-			basevalue[1] += (testvalue / averagingValue);
-			delay(1);
+		pad = 1;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
 	}
 	else if (numofpads == 3) {
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad0.capacitiveSensor(30);
-			basevalue[0] += (testvalue / averagingValue);
-			delay(1);
+		pad = 0;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad1.capacitiveSensor(30);
-			basevalue[1] += (testvalue / averagingValue);
-			delay(1);
+		pad = 1;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad2.capacitiveSensor(30);
-			basevalue[2] += (testvalue / averagingValue);
-			delay(1);
+		pad = 2;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
 	}
 	else if (numofpads == 4) {
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad0.capacitiveSensor(30);
-			basevalue[0] += (testvalue / averagingValue);
-			delay(1);
+		pad = 0;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad1.capacitiveSensor(30);
-			basevalue[1] += (testvalue / averagingValue);
-			delay(1);
+		pad = 1;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad2.capacitiveSensor(30);
-			basevalue[2] += (testvalue / averagingValue);
-			delay(1);
+		pad = 2;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
-		for (int i = 0; i < averagingValue; i++) {     // calculates the average nominal value when the pad is untouched at startup
-			testvalue = pad3.capacitiveSensor(30);
-			basevalue[3] += (testvalue / averagingValue);
-			delay(1);
+		pad = 3;
+		maxsample[pad] = 0;
+		minsample[pad] = 99999;
+		temp = 1;
+		while (temp != 0) {
+			temp = detect_touchFromNoise(pad);
+			update_basevalueFromNoise(pad);
 		}
 	}
-	
+	set_haptics(haptics_pin, hapticsdurationtemp, hapticsstrengthtemp);
 }
 
 
@@ -105,12 +143,29 @@ void AdvCapTouch::set_detectionThreshold(double dth, double rth) {   //set touch
 	rejectionThreshold = rth;
 }
 
+void AdvCapTouch::set_adaptiveSensitivity(int padnum, bool act) {
+	//read_valueFromNoise(padnum);
+	detectionThreshold = (maxsample[padnum] - minsample[padnum]);
+	rejectionThreshold = detectionThreshold;
+	adaptsensitivity = act;
+}
+
+void AdvCapTouch::set_adaptiveSensitivity(int padnum, double mastersensitivity, bool act) {
+	//read_valueFromNoise(padnum);
+	detectionThreshold = (maxsample[padnum] - minsample[padnum]);
+	rejectionThreshold = detectionThreshold;
+	sensitivity = mastersensitivity;
+	adaptsensitivity = act;
+}
 
 bool AdvCapTouch::input_condition(int padnum) {  //checks for valid capacitive touch
-	if (changevalue > (basevalue[padnum] + detectionThreshold)) {
+	if (changevalue[padnum] > (basevalue[padnum] + (detectionThreshold * sensitivity))) {
 		return true;
 	}
-	else if (changevalue <= (basevalue[padnum] + rejectionThreshold)) {
+	else if (changevalue[padnum] < (basevalue[padnum] + (rejectionThreshold * sensitivity)) && changevalue[padnum] > (basevalue[padnum] - (rejectionThreshold * sensitivity))) {
+		return false;
+	}
+	else {
 		return false;
 	}
 }
@@ -161,34 +216,35 @@ int AdvCapTouch::detect_touch(int padnum) {  //touch type detection function
 						delay(debounce);
 						input_duration++;
 						read_value(padnum);
-						
+
 					}
-					if (input_duration <= singleclickthresh && input_duration > 0) {  //touch is still a single tap
+					if ((input_duration <= singleclickthresh && input_duration > 0) || (input_duration < shortpressthresh && input_duration > singleclickthresh)) {  //touch is still a single tap
 						input_type = 1;
 					}
-					else if (input_duration > singleclickthresh && input_duration <= shortpressthresh) {  //touch is a shortpress
+					else if (input_duration >= shortpressthresh && input_duration <= longpressthresh || (input_duration < (longpressthresh + 20) && input_duration > longpressthresh)) {  //touch is a shortpress
 						input_type = 3;
 					}
-					else if (input_duration > longpressthresh + 20) {    //touch is a longpress
+					else if (input_duration >= longpressthresh + 20) {    //touch is a longpress
 						input_type = 4;
+						basevalue[padnum] = read_value(padnum);
 					}
 					else {
 						input_type = 0;   //invalid touch
 					}
-				
+
 				}
 			}
 			else {
 				///
 			}
 			return input_type;  // do something based on the input type
-			
+
 		}
 		else {  // invalid input
 	   ////
 		}
 	}
-	else { 
+	else {
 		input_type = 0;   //invalid touch
 		return input_type;
 	}
@@ -226,18 +282,19 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 				else if (input_condition(padnum) == true && doubleclick != true) {  //else enter long press detection
 					while (input_condition(padnum) == true && input_duration < input_reset) {  //calculate press lenght
 						delay(debounce);
-						input_duration += 3;
+						input_duration += 1;
 						read_valueFromNoise(padnum);
-						
+
 					}
-					if (input_duration <= singleclickthresh && input_duration > 0) {  //touch is still a single tap
+					if ((input_duration <= singleclickthresh && input_duration > 0) || (input_duration < shortpressthresh && input_duration > singleclickthresh) ) {  //touch is still a single tap
 						input_type = 1;
 					}
-					else if (input_duration > singleclickthresh && input_duration <= shortpressthresh) {  //touch is a shortpress
+					else if (input_duration >= shortpressthresh && input_duration <= longpressthresh || (input_duration < (longpressthresh + 20) && input_duration > longpressthresh)) {  //touch is a shortpress
 						input_type = 3;
 					}
-					else if (input_duration > longpressthresh + 20) {    //touch is a longpress
+					else if (input_duration >= longpressthresh + 20) {    //touch is a longpress
 						input_type = 4;
+						basevalue[padnum] = read_valueFromNoise(padnum);
 					}
 					else {
 						input_type = 0;   //invalid touch
@@ -246,13 +303,15 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 				}
 			}
 			else {
-				///
+				changevalue[padnum] = basevalue[padnum] - detectionThreshold;
+				return input_type;
 			}
-			return input_type;  // do something based on the input type
-
+			changevalue[padnum] = basevalue[padnum] - detectionThreshold;
+			return input_type; 
 		}
 		else {  // invalid input
-	   ////
+			input_type = 0;   //invalid touch
+			return input_type;
 		}
 	}
 	else {
@@ -261,82 +320,178 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 	}
 }
 
+int AdvCapTouch::detect_touch_single(int padnum) {  //single tap detection function
+	read_value(padnum);
+	if (input_condition(padnum) == true) {   //check for touch
+		delay(debounce);   // debounce
+		read_value(padnum);
+		if (input_condition(padnum) == true) {   //check again
+			haptics();   //turn on viberation motor to acknowledge touch
+			input_type = 1;   //set input type as single tap 
+			return input_type;  // return touch type (single tap)
 
+		}
+		else {  // invalid input
+			input_type = 0;   //invalid touch
+			return input_type;
+		}
+	}
+	else {
+		input_type = 0;   //invalid touch
+		return input_type;
+	}
+}
 
-double AdvCapTouch::read_value(int padnum) {  
+int AdvCapTouch::detect_touchFromNoise_single(int padnum) {  //single tap detection function
+	read_valueFromNoise(padnum);
+	if (input_condition(padnum) == true) {   //check for touch
+		delay(debounce);   // debounce
+		read_valueFromNoise(padnum);
+		if (input_condition(padnum) == true) {   //check again
+			haptics();   //turn on viberation motor to acknowledge touch
+			input_type = 1;   //set input type as single tap 
+			return input_type;  // return touch type (single tap)
+
+		}
+		else {  // invalid input
+			input_type = 0;   //invalid touch
+			return input_type;
+		}
+	}
+	else {
+		input_type = 0;   //invalid touch
+		return input_type;
+	}
+}
+
+double AdvCapTouch::read_value(int padnum) {
 	if (padnum == 0) {
-		changevalue = pad0.capacitiveSensor(30);
+		changevalue[padnum] = pad0.capacitiveSensor(speed_normal);
 	}
 	else if (padnum == 1) {
-		changevalue = pad1.capacitiveSensor(30);
+		changevalue[padnum] = pad1.capacitiveSensor(speed_normal);
 	}
 	else if (padnum == 2) {
-		changevalue = pad2.capacitiveSensor(30);
+		changevalue[padnum] = pad2.capacitiveSensor(speed_normal);
 	}
 	else if (padnum == 3) {
-		changevalue = pad3.capacitiveSensor(30);
+		changevalue[padnum] = pad3.capacitiveSensor(speed_normal);
 	}
-	return changevalue;
+	return changevalue[padnum];
 }
 
 double AdvCapTouch::read_valueFromNoise(int padnum) {   //returns only peak value from a small sample of the signal
+	double rate = 0.5;
+	double samplevalues[testsignalsize];
 	if (padnum == 0) {
-		int samplesize = testsignalsize;
-		double samplevalues[samplesize];
-		for (int i = 0; i < samplesize; i++) {
-			samplevalues[i] = pad0.capacitiveSensor(30);    // save 10 sample values to the sample array
-		}
-		double maxsample = samplevalues[0];
-		for (int j = 1; j < samplesize; j++) {    //find the maximum sample from those samples
-			if (samplevalues[j] > maxsample) {
-				maxsample = samplevalues[j];
+		maxsample[padnum] = 0;
+		for (int i = 0; i < testsignalsize; i++) {
+			samplevalues[i] = pad0.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+		  //find the maximum and minimum values from those samples
+			if (samplevalues[i] == 0) {
+
+			}
+			else if (samplevalues[i] > maxsample[padnum]) {
+				maxsample[padnum] = samplevalues[i];
+			}
+			else if (samplevalues[i] < minsample[padnum]) {
+				minsample[padnum] = samplevalues[i];
 			}
 		}
-		changevalue = maxsample;    //set maximum value as the changevalue
+		//set maximum value as the changevalue(damping drastic changes)
+		if (changevalue[padnum] > maxsample[padnum]) {
+			changevalue[padnum] -= ((changevalue[padnum] - maxsample[padnum]) * rate);
+		}
+		else if (changevalue[padnum] < maxsample[padnum]) {
+			changevalue[padnum] += ((maxsample[padnum] - changevalue[padnum]) * rate);
+		}
+		else {
+
+		}
 	}
 	else if (padnum == 1) {
-		int samplesize = testsignalsize;
-		double samplevalues[samplesize];
-		for (int i = 0; i < samplesize; i++) {
-			samplevalues[i] = pad1.capacitiveSensor(30);    // save 10 sample values to the sample array
-		}
-		double maxsample = samplevalues[0];
-		for (int j = 1; j < samplesize; j++) {    //find the maximum sample from those samples
-			if (samplevalues[j] > maxsample) {
-				maxsample = samplevalues[j];
+		maxsample[padnum] = 0;
+		for (int i = 0; i < testsignalsize; i++) {
+			samplevalues[i] = pad1.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+		  //find the maximum and minimum values from those samples
+			if (samplevalues[i] == 0) {
+
+			}
+			else if (samplevalues[i] > maxsample[padnum]) {
+				maxsample[padnum] = samplevalues[i];
+			}
+			else if (samplevalues[i] < minsample[padnum]) {
+				minsample[padnum] = samplevalues[i];
 			}
 		}
-		changevalue = maxsample;    //set maximum value as the changevalue
+		//set maximum value as the changevalue(damping drastic changes)
+		if (changevalue[padnum] > maxsample[padnum]) {
+			changevalue[padnum] -= ((changevalue[padnum] - maxsample[padnum]) * rate);
+		}
+		else if (changevalue[padnum] < maxsample[padnum]) {
+			changevalue[padnum] += ((maxsample[padnum] - changevalue[padnum]) * rate);
+		}
+		else {
+
+		}
 	}
 	else if (padnum == 2) {
-		int samplesize = testsignalsize;
-		double samplevalues[samplesize];
-		for (int i = 0; i < samplesize; i++) {
-			samplevalues[i] = pad2.capacitiveSensor(30);    // save 10 sample values to the sample array
-		}
-		double maxsample = samplevalues[0];
-		for (int j = 1; j < samplesize; j++) {    //find the maximum sample from those samples
-			if (samplevalues[j] > maxsample) {
-				maxsample = samplevalues[j];
+		maxsample[padnum] = 0;
+		for (int i = 0; i < testsignalsize; i++) {
+			samplevalues[i] = pad2.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+		  //find the maximum and minimum values from those samples
+			if (samplevalues[i] == 0) {
+
+			}
+			else if (samplevalues[i] > maxsample[padnum]) {
+				maxsample[padnum] = samplevalues[i];
+			}
+			else if (samplevalues[i] < minsample[padnum]) {
+				minsample[padnum] = samplevalues[i];
 			}
 		}
-		changevalue = maxsample;    //set maximum value as the changevalue
+		//set maximum value as the changevalue(damping drastic changes)
+		if (changevalue[padnum] > maxsample[padnum]) {
+			changevalue[padnum] -= ((changevalue[padnum] - maxsample[padnum]) * rate);
+		}
+		else if (changevalue[padnum] < maxsample[padnum]) {
+			changevalue[padnum] += ((maxsample[padnum] - changevalue[padnum]) * rate);
+		}
+		else {
+
+		}
 	}
 	else if (padnum == 3) {
-		int samplesize = testsignalsize;
-		double samplevalues[samplesize];
-		for (int i = 0; i < samplesize; i++) {
-			samplevalues[i] = pad3.capacitiveSensor(30);    // save 10 sample values to the sample array
-		}
-		double maxsample = samplevalues[0];
-		for (int j = 1; j < samplesize; j++) {    //find the maximum sample from those samples
-			if (samplevalues[j] > maxsample) {
-				maxsample = samplevalues[j];
+		maxsample[padnum] = 0;
+		for (int i = 0; i < testsignalsize; i++) {
+			samplevalues[i] = pad3.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+		  //find the maximum and minimum values from those samples
+			if (samplevalues[i] == 0) {
+
+			}
+			else if (samplevalues[i] > maxsample[padnum]) {
+				maxsample[padnum] = samplevalues[i];
+			}
+			else if (samplevalues[i] < minsample[padnum]) {
+				minsample[padnum] = samplevalues[i];
 			}
 		}
-		changevalue = maxsample;    //set maximum value as the changevalue
+		//set maximum value as the changevalue(damping drastic changes)
+		if (changevalue[padnum] > maxsample[padnum]) {
+			changevalue[padnum] -= ((changevalue[padnum] - maxsample[padnum]) * rate);
+		}
+		else if (changevalue[padnum] < maxsample[padnum]) {
+			changevalue[padnum] += ((maxsample[padnum] - changevalue[padnum]) * rate);
+		}
+		else {
+
+		}
 	}
-	return changevalue;
+	return changevalue[padnum];
 }
 
 void AdvCapTouch::update_basevalue(int padnum) {  // keeps base value updated by averaging
@@ -344,6 +499,63 @@ void AdvCapTouch::update_basevalue(int padnum) {  // keeps base value updated by
 	resetvalues();
 }
 
+void AdvCapTouch::update_basevalueFromNoise(int padnum) {  // keeps both the basevalue and the touch thresholds updated
+	double rate = 0.1;
+	update_basevalueSmooth(padnum, rate);
+	resetvalues();
+
+	//update touch thresholds (adaptive touch sensitivity)
+	if (adaptsensitivity == true) {
+		double temp = (maxsample[padnum] - minsample[padnum]);
+		if (temp > detectionThreshold) {
+			detectionThreshold += ((temp - detectionThreshold) * rate);
+		}
+		else if (temp < detectionThreshold) {
+			detectionThreshold -= ((detectionThreshold - temp) * rate);
+		}
+		else {
+			detectionThreshold = temp;
+		}
+		rejectionThreshold = detectionThreshold;
+		minsample[padnum] = maxsample[padnum];
+	}
+	/*
+	Serial.print(basevalue[padnum]);
+	Serial.print("\t");
+	Serial.print(detectionThreshold);
+	Serial.print("\t");
+	*/
+}
+
+void AdvCapTouch::update_basevalueSmooth(int padnum, double rate) {   //Function to gradually update basevalue
+	maxsample[padnum] = 0;
+	double samplevalues[testsignalsize];
+	for (int i = 0; i < testsignalsize; i++) {
+		samplevalues[i] = pad0.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+	  //find the maximum and minimum values from those samples
+		if (samplevalues[i] == 0) {
+
+		}
+		else if (samplevalues[i] > maxsample[padnum]) {
+			maxsample[padnum] = samplevalues[i];
+		}
+		else if (samplevalues[i] < minsample[padnum]) {
+			minsample[padnum] = samplevalues[i];
+		}
+	}
+
+	//calculate direction of change and update basevalue
+	if (basevalue[padnum] > maxsample[padnum]) {
+		basevalue[padnum] -= ((basevalue[padnum] - maxsample[padnum]) * rate);
+	}
+	else if (basevalue[padnum] < maxsample[padnum]) {
+		basevalue[padnum] += ((maxsample[padnum] - basevalue[padnum]) * rate);
+	}
+	else {
+		basevalue[padnum] = maxsample[padnum];
+	}
+}
 
 void AdvCapTouch::resetvalues() {
 	input_type = 0;
@@ -362,5 +574,6 @@ void AdvCapTouch::haptics() {  //function for viberation feedback
 	delay(haptics_duration);
 	analogWrite(haptics_pin, 0);
 }
+
 
 

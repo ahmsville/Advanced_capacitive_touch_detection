@@ -22,8 +22,14 @@ read_value	KEYWORD2
 detect_touchFromNoise	KEYWORD2
 read_valueFromNoise	KEYWORD2
 update_basevalue	KEYWORD2
+update_basevalueFromNoise	KEYWORD2
 resetvalues	KEYWORD2
+set_haptics	KEYWORD2
 haptics	KEYWORD2
+detect_touch_single	KEYWORD2
+detect_touchFromNoise_single	KEYWORD2
+set_adaptiveSensitivity	KEYWORD2
+update_basevalueSmooth	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

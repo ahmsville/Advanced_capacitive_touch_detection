@@ -6,7 +6,7 @@
  * upload sketch and view resulting signal from the serial plotter
  * use "read_valueFromNoise(0)" instead of  "read_value(0)"   to cleanup the signal if touch is not distinguishable from noise
  *
- *....Written By Ahmed Oyenuga (Ahmsville 2019).
+ *....By Ahmsville...
  */
 
 AdvCapTouch samplepad  = AdvCapTouch();  //create a new captouch instance
@@ -20,5 +20,5 @@ void setup() {
 }
 void loop() {
 capvalue = samplepad.read_value(0);  
-  Serial.println(capvalue);
+Serial.println(capvalue);
 }
