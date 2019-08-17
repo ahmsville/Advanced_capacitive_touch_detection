@@ -51,13 +51,31 @@ Line six is used to initialize the capacitive touch, the function initialize_cap
 
 ```C
 void loop() {
-touchtype = samplepad.detect_touch(0);  //function return 1-4 based on the input detected, 1 = singletap, 2 = doubletap, 3 = shortpress, 4 = longpress
-Serial.println(touchtype);
-  samplepad.update_basevalue(0);
+touchtype = samplepad.detect_touchFromNoise(0);  //function return 1-4 based on the input detected, 1 = singletap, 2 = doubletap, 3 = shortpress, 4 = longpress
+if (touchtype == 1) {
+  Serial.println("Singletap");   
+}
+else if (touchtype == 2) {
+  Serial.println("Doubletap");
+}
+else if (touchtype == 3) {
+  Serial.println("Shortpress");
+}
+else if (touchtype == 4) {
+  Serial.println("longpress");
+}
+samplepad.update_basevalueFromNoise(0);
 }
 ```
 
-There are two main functions for running the touch detection algorithm, the first is the detect_touch() function. This function should be used for a low noise touch setup, the function will return an integer value from 0 – 4.
+There are four main functions for running the touch detection algorithms;
+
+ 1) detect_touch(padnum) - to be used for low noise touch setups
+ 2) detect_touchFromNoise(padnum) - to be used for noisy setups (recommended)
+ 3) detect_touch_single(padnum) - use this function to quickly detect single taps (low noise setup)
+ 4) detect_touchFromNoise_single(padnum) - use this function to quickly detect single taps (noisy setup, recommended)
+
+the function above will return an integer value from 0 – 4.
 
  •	0 means no touch was detected.
  
@@ -69,7 +87,7 @@ There are two main functions for running the touch detection algorithm, the firs
  
  •	4 means a long press was detected.
  
-The function detect_touch() should always be called with a integer value from 0 – 3, this value represents the position of the capacitive touch pad you want to run a touch detection on.
-For noisy touch setups, use the detect_touchFromNoise() function instead, this function is more reliable and works in the exact same way as detect_touch(). Because this algorithm involves signal sampling, it is just a little bit slower than the alternative.
-The second function update_basevalue() in the loop is used to continuously update the nominal value of the touch pad. This function is integral to making the touch detection adaptable across various touch conditions.
+For noisy touch setups, use the detect_touchFromNoise(padnum) function instead, this function is more reliable and works in the exact same way as detect_touch(); because this algorithm involves signal sampling, it is just a little bit slower than the alternative.
+
+The second function update_basevalue(padnum) or update_basevalueFromNoise(padnum) in the loop is used to continuously update the nominal value of the touch pad. This function is integral to making the touch detection adaptable across various touch conditions.
 
