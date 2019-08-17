@@ -1,7 +1,7 @@
 # Advanced_capacitive_touch_detection
 
-These capacitive touch detection library is an extension of the Arduino capacitive touch library, it offers two detection algorithms that solves two of the main problems associated with detecting capacitive touch on the Arduino. The library also allows advanced touch detections; such as, Double tap, Short press and Long press. Also featured in the library is a haptics controller, this allows you to connect and control a vibration motor as a feedback when you interact with the capacitive touch surface.
-See Video @ https://youtu.be/atb6d4b-VYk
+These capacitive touch detection library is an extension of the Arduino capacitive touch library by Paul Badger, it offers two detection algorithms that solves two of the main problems associated with detecting capacitive touch on the Arduino. The library also allows advanced touch detections; such as, Double tap, Short press and Long press. Also featured in the library is a haptics controller, this allows you to connect and control a vibration motor as a feedback when you interact with the capacitive touch surface.
+See Video @ https://youtu.be/atb6d4b-VYk or read the included pdf.
 
 ```C
 #include <AdvCapTouch.h>
