@@ -5,16 +5,28 @@ See Video @ https://youtu.be/atb6d4b-VYk or read the included pdf.
 
 ```C
 #include <AdvCapTouch.h>
+/*Example sketch for detecting singletap, doubletap, shortpress and longpress from a capacitive thouch pad
+ * this sketch allows touch detection from a noisy signal using the "detect_touchFromNoise()" function
+ * connect 1M resistor between pin 3 & 4 on the arduino
+ * connect your conductive surface to pin 4
+ * connect viberation motor(haptics) switch circuit to pin 9 (optional)
+ * open serial monitor to view touchtypes.
+ * 
+ *....By Ahmsville...
+ */
 
-AdvCapTouch samplepad  = AdvCapTouch();  //create a new captouch object
+AdvCapTouch samplepad  = AdvCapTouch();  //create a new captouch instance
 int touchtype;
 
 void setup() {
-  samplepad.set_inputTypeThresholds(20, 40, 70, 150); // set the thresholds for the four input types  (singletap, shortpress, longpress, doubletapspeed)
-  samplepad.set_detectionThreshold(400, 100);  //set touch sensitivity in the form of detection, rejection thresholds values
   samplepad.set_capTouchPins(3,4,0,0,0);   //set arduino pins associated with the pads (sendpin, receivepin1, receivepin2, receivepin3, receivepin4) this example uses just one pad.
+  /************************************************************************************************************************************************************/
+  samplepad.set_adaptiveSensitivity(0, 0.7, true);  //set touch sensitivity to adaptive (very helpful for noisy signals)----"set_detectionThreshold()" can also be used instead. (pad, sensitivity(0.1 - 1), turn-on/off(true or false))
+  //samplepad.set_detectionThreshold(400, 100);  //set touch sensitivity in the form of detection, rejection thresholds values (manually set touch thresholds if you dont want to use adaptive sensitivity)
+  /************************************************************************************************************************************************************/
+  samplepad.set_inputTypeThresholds(20, 40, 80, 150); // set the thresholds for the four input types  (singletap, shortpress, longpress, doubletapspeed)
+   samplepad.set_haptics(9,40,255);  //set haptic feedback variables (arduino pwm pin, duration of haptics(ms), pwn strength from 0-255)------(optional)
   samplepad.initialize_capTouch(1);
-  samplepad.set_haptics(6,40,255);  //set haptic feedback variables (arduino pwm pin, duration of haptics(ms), pwn strength from 0-255)
   Serial.begin(9600);
 }
 ```
