@@ -21,7 +21,7 @@ int touchtype;
 void setup() {
   samplepad.set_capTouchPins(3,4,0,0,0);   //set arduino pins associated with the pads (sendpin, receivepin1, receivepin2, receivepin3, receivepin4) this example uses just one pad.
   /************************************************************************************************************************************************************/
-  samplepad.set_adaptiveSensitivity(0, 0.7, true);  //set touch sensitivity to adaptive (very helpful for noisy signals)----"set_detectionThreshold()" can also be used instead. (pad, sensitivity(0.1 - 1), turn-on/off(true or false))
+  samplepad.set_adaptiveSensitivity(1, 0.7, true);  //set touch sensitivity to adaptive (very helpful for noisy signals)----"set_detectionThreshold()" can also be used instead. (pad, sensitivity(0.1 - 1), turn-on/off(true or false))
   //samplepad.set_detectionThreshold(400, 100);  //set touch sensitivity in the form of detection, rejection thresholds values (manually set touch thresholds if you dont want to use adaptive sensitivity)
   /************************************************************************************************************************************************************/
   samplepad.set_inputTypeThresholds(20, 40, 80, 150); // set the thresholds for the four input types  (singletap, shortpress, longpress, doubletapspeed)
@@ -36,6 +36,8 @@ The code snippet above shows how you would typically setup the library.
 Line 2 is used to create a new capacitive touch object; the object is named “samplepad” but you can give any other name.
 
 In the setup section of the code, Line one is used to configure the Arduino pins connected to the resistor and the touch surfaces. The code sample uses just one pin i:e one touch pad. You can have up to 4 pads connected, all of which will share the same send pin.
+
+Line two calls the function set_adaptiveSensitivity(), this function gives your capacitive touch the ability to adapt its sensitivity to the noise level, the function accepts three parameters (number of pads, sensitivity(0.1 - 1), turn-on/off(true or false)).
 
 The third line set_detectionThreshold(); can be used to set the sensitivity of the capacitive touch surface. The function accepts two integers, the touch detection threshold and the touch rejection threshold, the recommended ratio of detection to rejection threshold is 4:1. The larger the detection thresholds, the lower the pad sensitivity.
 
