@@ -27,16 +27,16 @@ private:
 
 
 	int input_type, input_duration = 0, input_reset = 0, averagingValue = 50;
-	int debounce = 2, doubleclickspeed, testsignalsize = 10, speed_noise = 5, speed_normal = 20, updatetimer = 0;
+	int debounce = 2, doubleclickspeed, testsignalsize = 10, speed_noise = 4, speed_normal = 20, updatetimer = 0;
 	int singleclickthresh, shortpressthresh, longpressthresh;
-	int haptics_pin = 0, haptics_duration = 0, haptics_strength = 0;
+	int haptics_pin = 0, haptics_duration = 0, haptics_strength = 0, haptics_ontime, haptics_offtime, haptics_state;
 
 
 	bool doubleclick, adaptsensitivity = false;
 
 	double sensitivity = 1;  //controls master sensitivity in adaptive sensitivity mode.  range-(0.1 - 1)
-	double detectionThreshold = 0.1;
-	double rejectionThreshold;
+	double detectionThreshold[4] = { 0.1,0.1,0.1,0.1 };
+	double rejectionThreshold[4] = {0,0,0,0};
 	double changevalue[4] = { 0,0,0,0 }, basevalue[4] = {0,0,0,0}, maxsample[4], minsample[4];
 
 public:
@@ -44,9 +44,9 @@ public:
 	AdvCapTouch();
 	void initialize_capTouch (int numofpads);
 	void set_inputTypeThresholds (int scl, int spr, int lpr, int dcls);   //sets the thresholds for the four input types  (singletap, shortpress, longpress, doubletapspeed)
-	void set_detectionThreshold (double dth, double rth);  //set touch sensitivity in the form of detection, rejection thresholds values
+	void set_detectionThreshold (int padnum, double dth, double rth);  //set touch sensitivity in the form of detection, rejection thresholds values
 	void set_adaptiveSensitivity(int padnum, bool act);  //adapts touch sensitivity depending on the noise level 
-	void set_adaptiveSensitivity(int padnum, double mastersensitivity, bool act);  //adapts touch sensitivity depending on the noise level 
+	void set_adaptiveSensitivity(int numofpads, double mastersensitivity, bool act);  //adapts touch sensitivity depending on the noise level 
 	bool input_condition (int padnum);   //checks for valid capacitive touch
 	void set_capTouchPins (int sp, int rp0, int rp1, int rp2, int rp3);  //sets the arduino pins used for the capacitive touch detection (sendpin, receivepin1, receivepin2, receivepin3, receivepin4)
 
@@ -66,7 +66,9 @@ public:
 	void update_basevalueSmooth(int padnum, double rate);
 	void resetvalues ();
 	void set_haptics(int pin, int duration, int strength);  //use to set haptics variables (arduino pwm pin, duration of haptics(ms), strength from 0-255)
-	void haptics ();
+	void haptics (int state);
+	void haptics();
+	void show_levels(int padnum);
 	
 	
 	
