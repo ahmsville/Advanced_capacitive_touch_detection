@@ -1,0 +1,41 @@
+#######################################
+# Syntax Coloring Map For Test
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AdvCapTouch	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################		
+
+initialize_capTouch	KEYWORD2
+set_inputTypeThresholds	KEYWORD2
+set_detectionThreshold	KEYWORD2
+input_condition	KEYWORD2
+set_capTouchPins	KEYWORD2
+detect_touch	KEYWORD2
+read_value	KEYWORD2
+detect_touchFromNoise	KEYWORD2
+read_valueFromNoise	KEYWORD2
+update_basevalue	KEYWORD2
+update_basevalueFromNoise	KEYWORD2
+resetvalues	KEYWORD2
+set_haptics	KEYWORD2
+haptics	KEYWORD2
+detect_touch_single	KEYWORD2
+detect_touchFromNoise_single	KEYWORD2
+set_adaptiveSensitivity	KEYWORD2
+update_basevalueSmooth	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
