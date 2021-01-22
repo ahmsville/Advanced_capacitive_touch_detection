@@ -33,7 +33,6 @@ void AdvCapTouch::initialize_capTouch(int numofpads) {
 		pinMode(receivepin[i], INPUT);
 	}
 
-	
 }
 
 
@@ -142,11 +141,20 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 		read_valueFromNoise(padnum);
 		if (input_condition(padnum) == true) {   //check again
 			haptics(0);
-			if ((millis() - time_touched) > shortpressthresh) {  //shortpress
+			long temptime = (millis() - time_touched);
+			if (temptime > shortpressthresh) {  //shortpress
 				input_type = 3;
 			}
-			if ((millis() - time_touched) > longpressthresh) {
+			if (temptime > longpressthresh && temptime < 4000) {
 				input_type = 4;
+				if (!longpresshaptics) {
+					haptics(1); //turn on viberation to indicate long pressthresh
+					longpresshaptics = true;
+				}
+				//returntouchtype = true;
+			}
+			if (temptime >= 4000) {  //extra long touch input for special operations
+				input_type = 5;
 				returntouchtype = true;
 			}
 		}
@@ -176,6 +184,7 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 				if (input_condition(padnum) == true) {   //check again
 					//Serial.println((millis() - time_touched));
 					if ((millis() - time_touched) > doubleclickspeed) {
+						haptics(1);
 						input_type = 2;
 						returntouchtype = true;
 					}
@@ -190,6 +199,7 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 	}
 
 	if (returntouchtype == true) {
+		longpresshaptics = false;
 		samplecounter = testsignalsize;
 		changevalue[padnum] = minsample[padnum];  // avoid repititive detection
 		returntouchtype = false;
@@ -200,6 +210,10 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 		return tempdetectedinput;
 	}
 	else {
+		if (detectionstate == 1 || detectionstate == 2) { //detection has started
+			update_basevalueFromNoise(padnum);
+			return -1;
+		}
 		update_basevalueFromNoise(padnum);
 		return 0;
 	}
@@ -332,6 +346,9 @@ double AdvCapTouch::read_valueFromNoise(int padnum) {   //returns only peak valu
 
 		}
 	}
+	//SerialUSB.print(basevalue[0]);
+	//SerialUSB.print("\t");
+	//SerialUSB.println(changevalue[padnum]);
 	return changevalue[padnum];
 }
 
