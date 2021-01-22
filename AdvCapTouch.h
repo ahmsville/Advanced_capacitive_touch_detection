@@ -27,21 +27,21 @@ private:
 
 
 	int input_type, tempdetectedinput;
-	int debounce = 10, doubleclickspeed, singletaptresh, samplecounter = 0, speed_noise = 5, speed_normal = speed_noise;
+	int debounce = 10, doubleclickspeed, singletaptresh, samplecounter = 0, speed_noise = 10, speed_normal = speed_noise;
 	int shortpressthresh, longpressthresh;
 	int haptics_pin = 0, haptics_duration = 0, haptics_strength = 0, haptics_ontime, haptics_offtime, haptics_state;
 
-	int detectionstate = false;
+	int detectionstate = 0;
 	long time_touched = 0;
 	bool returntouchtype = false;
 	bool doubleclick, adaptsensitivity = false;
-	int testsignalsize = 50;
-	double samplevalues[50];
-	float sensitivity = 1, capvalueupdate_rate = 0.05;  //controls master sensitivity in adaptive sensitivity mode.  range-(0.1 - 1)
+	int testsignalsize = 25;
+	double samplevalues[25];
+	float sensitivity = 1, capvalueupdate_rate = 0.1;  //controls master sensitivity in adaptive sensitivity mode.  range-(0.1 - 1)
 	float detectionThreshold[4] = { 0.1,0.1,0.1,0.1 };
 	float rejectionThreshold[4] = {0,0,0,0};
-	float changevalue[4] = { 0,0,0,0 }, basevalue[4] = {1000,0,0,0}, maxsample[4], minsample[4];
-
+	float changevalue[4] = { 0,0,0,0 }, basevalue[4] = {1000,1000,1000,1000}, maxsample[4], minsample[4];
+	bool longpresshaptics = false;
 	double tempread;
 
 public:
