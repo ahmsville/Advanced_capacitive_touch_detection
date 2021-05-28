@@ -386,9 +386,12 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 		return tempdetectedinput;
 	}
 	else {
-		if (detectionstate == 1 || detectionstate == 2) { //detection has started
-			update_basevalueFromNoise(padnum);
-			return -1;
+		if (detectionstate != 0)
+		{
+			if (input_type < 3) { //detection has started
+				update_basevalueFromNoise(padnum);
+				return -1;
+			}
 		}
 		update_basevalueFromNoise(padnum);
 		return 0;
