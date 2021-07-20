@@ -18,6 +18,10 @@ capacitive touch surface.
 #define detectmode 1 //damping detection
 //#define detectmode 2 //standard deviation detection
 
+/**********************************************************************************************************/
+
+/**********************************************************************************************************/
+
 
 class AdvCapTouch {
 private:
@@ -29,16 +33,21 @@ private:
 
 
 	int input_type, tempdetectedinput;
-	int debounce = 10, floatclickspeed, singletaptresh, samplecounter = 0, humpsamplecounter = 0, speed_noise = 10, speed_normal = speed_noise;
+	int floatclickspeed, singletaptresh, samplecounter = 0, humpsamplecounter = 0, speed_noise = 3, speed_normal = speed_noise;
 	int shortpressthresh, longpressthresh;
 	int haptics_pin = 0, haptics_duration = 0, haptics_strength = 0, haptics_ontime, haptics_offtime, haptics_state;
 
+	long spikereleasetime = 1000, spikedetecttime = 0, debounce = 50;
+
 	float mean = 0, humpmean = 0, treshmean = 0, median = 0, humpmedian = 0, standarddeviation = 0;
 	bool touchspikedetected = false;
-	int touchspikesampleposition = 0;
+	bool interruptValue_aquisition = false;
 	float minsense = 5, maxsense = 100;
 
+	float maxtouchrange = 100;
+
 	float SDs_away = 0;
+	float treshbasevalue = 0;
 
 	float prevsignalsample = 0, prevhumpsample = 0;
 
@@ -46,20 +55,22 @@ private:
 	long time_touched = 0;
 	bool returntouchtype = false;
 	bool floatclick, adaptsensitivity = false;
-    int testsignalsize = 25, humpsignalsize = 8;
-	float samplevalues[25], humpsamplevalues[8];
-	float sensitivity = 1.2, capvalueupdate_rate = 0.1;  //controls master sensitivity in adaptive sensitivity mode.  range-(0.1 - 1)
+	int testsignalsize = 30;
+	float samplevalues[30];
+	float sensitivity = 1.2, capvalueupdate_rate = 10;  //controls master sensitivity in adaptive sensitivity mode.  range-(0.1 - 1)
 	float detectionThreshold[4] = { 0,0.1,0.1,0.1 };
 	float rejectionThreshold[4] = {0,0,0,0};
-	float changevalue[4] = { 0,0,0,0 }, basevalue[4] = { 1000,1000,1000,1000 }, maxsample[4] = {99999,99999,99999,99999}, minsample[4];
+	float changevalue[4] = { 0,0,0,0 }, basevalue[4] = { 0,0,0,0 }, maxsample[4] = {99999,99999,99999,99999}, minsample[4];
 	bool longpresshaptics = false, shortpresshaptics = false, extralongpresshaptics = false;
 	float tempread;
 
 	bool repopulating = false;
+	bool startWith_interrupt = true;
 
 public:
 
 	AdvCapTouch();
+	AdvCapTouch(bool useint);
 	void initialize_capTouch (int numofpads);
 	void set_inputTypeThresholds (int stp, int spr, int lpr, int dcls);   //sets the thresholds for the four input types  (singletap, shortpress, longpress, floattapspeed)
 	void set_adaptiveSensitivity(int padnum, bool act);  //adapts touch sensitivity depending on the noise level 
@@ -74,6 +85,7 @@ public:
 	int detect_touchFromNoise_single(int padnum);  //single tap detection function (noisy signals)
 	float read_value(int padnum);  //read cap touchpad values (unprocessed signal)
 	float read_valueFromNoise(int padnum); //read cap touchpad values (processed signal)
+	void read_valueFromNoise_interrupt();
 
 	/*---------------------------------------------------------------------------------------------------------------------------------*/
 
