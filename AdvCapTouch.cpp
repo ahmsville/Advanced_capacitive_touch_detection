@@ -13,14 +13,49 @@ capacitive touch surface.
 */
 
 
-AdvCapTouch::AdvCapTouch() {
 
+void AdvCapTouch::read_valueFromNoise_interrupt()
+{
+	if (startWith_interrupt)
+	{
+		changevalue[0] = ((pad0.capacitiveSensor(speed_noise)) + (changevalue[0] * capvalueupdate_rate)) / (capvalueupdate_rate + 1);
+		//basevalue[padnum] = (tempread + (basevalue[padnum] * 150)) / (150 + 1);
+
+		addSample(0, changevalue[0]);
+		//getmean();
+		//getstandarddeviation();
+
+		//SerialUSB.print("started in interrupt");
+		//SerialUSB.print("\t");
+		//SerialUSB.print(basevalue[0]);
+		//SerialUSB.print("\t");
+		//SerialUSB.println(changevalue[0]);
+
+		
+	}
+	
+	
+	
+	
+	
+
+	//SerialUSB.println("read");
+}
+
+
+AdvCapTouch::AdvCapTouch() {
+	
+}
+
+AdvCapTouch::AdvCapTouch(bool useint) {
+
+	interruptValue_aquisition = useint;
 }
 
 void AdvCapTouch::initialize_capTouch(int numofpads) {
 
-	set_adaptiveSensitivity(1, 1.2, true);  //set touch sensitivity to adaptive (very helpful for noisy signals)--- (number of pads, sensitivity(-1 to 1), turn-on/off(true or false))
-	set_inputTypeThresholds(300, 1000, 2000, 180); // set the thresholds for the four input types  (singletap, shortpress, longpress, floattapspeed)
+	set_adaptiveSensitivity(1, 0.1, true);  //set touch sensitivity to adaptive (very helpful for noisy signals)--- (number of pads, sensitivity(-1 to 1), turn-on/off(true or false))
+	set_inputTypeThresholds(300, 1000, 2000, 220); // set the thresholds for the four input types  (singletap, shortpress, longpress, floattapspeed)
 
 	pad0.set_CS_AutocaL_Millis(0xFFFFFFFF);     // turn off autocalibrate on channel 1
 	pad1.set_CS_AutocaL_Millis(0xFFFFFFFF);     // turn off autocalibrate on channel 2
@@ -65,51 +100,76 @@ void AdvCapTouch::set_adaptiveSensitivity(int numofpads, float mastersensitivity
 
 bool AdvCapTouch::checkTouch(int padnum) {  //checks for valid capacitive touch
 
-	if (detectionThreshold[padnum] == 0)
+	if (basevalue[padnum] == 0)
 	{
 		return false;
 	}
-	
-		if (detectionstate == 0) {
-			if (humpmean > (mean + (sensitivity * detectionThreshold[padnum]))) {
-				if (touchspikedetected)
-				{
-					return false;
-				}
-				else {
-					//SerialUSB.print(standarddeviation);
-			//SerialUSB.print("\t");
-			//SerialUSB.println(SDs_away);
-					return true;
-				}
+
+	if (detectionstate == 0) {
+		if (changevalue[padnum] > (basevalue[padnum] + (sensitivity * detectionThreshold[padnum]))) {
+			if (touchspikedetected)
+			{
+				return false;
 			}
 			else {
-				return false;
+				//SerialUSB.print(standarddeviation);
+		//SerialUSB.print("\t");
+		//SerialUSB.println(SDs_away);
+				return true;
 			}
 		}
 		else {
-			if (humpmean > (treshmean + (sensitivity * detectionThreshold[padnum]))) {
-				return true;
-			}
-			else {
+			return false;
+		}
+	}
+	else {
+		if (changevalue[padnum] > (treshbasevalue + (sensitivity * detectionThreshold[padnum]))) {
+			if (touchspikedetected)
+			{
+				
+				detectionstate = 0;
+				input_type = 0;
+				returntouchtype = true;
 				return false;
 			}
+			else {
+				//SerialUSB.print(standarddeviation);
+		//SerialUSB.print("\t");
+		//SerialUSB.println(SDs_away);
+				return true;
+			}
 		}
-	
-	
-	
-	
+		else {
+			return false;
+		}
+	}
+
+
+
+
 }
 
 bool AdvCapTouch::checkRelease(int padnum) {  //checks for valid capacitive touch
 
-	
-	if (humpmean < (mean - (3*detectionThreshold[padnum]))) {
-		return true;
-	}
-	else {
+
+	if (touchspikedetected)
+	{
+		
+		detectionstate = 0;
+		input_type = 0;
+		returntouchtype = true;
 		return false;
 	}
+	else {
+		if (changevalue[padnum] < treshbasevalue) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	
 
 
 }
@@ -161,98 +221,50 @@ void AdvCapTouch::getmedian() {
 		median = rearrangedarray[(testsignalsize - 1) / 2];
 	}
 	//calc humpmedian
-	double rearrangedhumparray[humpsignalsize];
-	memset(rearrangedhumparray, 0, sizeof(rearrangedhumparray));
-	for (int i = 0; i < humpsignalsize; i++) {
-		double currentsample = humpsamplevalues[i];
-		int pos = 0;
-		for (int j = 0; j < humpsignalsize; j++) {
-			if (humpsamplevalues[j] >= currentsample) {
-				pos += 1;
-			}
-			if (rearrangedhumparray[j] == currentsample) {
-				pos -= 1;
-			}
-		}
-		if (pos == 0) {
-			pos = humpsignalsize - 1;
-			rearrangedhumparray[pos] = currentsample;
-		}
-		else {
-			pos = (humpsignalsize - pos);
-			rearrangedhumparray[pos] = currentsample;
-		}
-	}
 
-	if (humpsignalsize % 2 == 0) {
-		humpmedian = (rearrangedhumparray[humpsignalsize / 2] + rearrangedhumparray[(humpsignalsize / 2) - 1]) / 2;
-	}
-	else {
-		humpmedian = rearrangedhumparray[(humpsignalsize - 1) / 2];
-	}
 }
 
 void AdvCapTouch::getmean() {
 	float samplesum = 0;
 	float humpsamplesum = 0;
-	if (mean >= 0) {
+	if (basevalue[0] != 0) {
 		for (int i = 0; i < testsignalsize; i++) {
 			samplesum += samplevalues[i];
 		}
-		for (int i = 0; i < humpsignalsize; i++) {
-			humpsamplesum += humpsamplevalues[i];
-		}
-		mean = (samplesum - humpsamplesum) / (testsignalsize - humpsignalsize);
-		humpmean = humpsamplesum / humpsignalsize;
-	}
-	else {
-		if ((samplecounter - 1) >= 0) {
-			mean = ((mean * (testsignalsize - humpsignalsize)) - prevsignalsample + samplevalues[samplecounter - 1]) / (testsignalsize - humpsignalsize);
-		}
-		else {
-			mean = ((mean * (testsignalsize - humpsignalsize)) - prevsignalsample + samplevalues[testsignalsize - 1]) / (testsignalsize - humpsignalsize);
-		}
-		if ((humpsamplecounter - 1) >= 0) {
-			humpmean = ((humpmean * humpsignalsize) - prevhumpsample + humpsamplevalues[humpsamplecounter - 1]) / humpsignalsize;
-		}
-		else {
-			humpmean = ((humpmean * humpsignalsize) - prevhumpsample + humpsamplevalues[humpsignalsize - 1]) / humpsignalsize;
-		}	
+
+		mean = samplesum / testsignalsize;
 
 	}
-	
-	
+
+
+
 }
 
 void AdvCapTouch::addSample(int padnum, float value) {
-	if (samplecounter == touchspikesampleposition) {
-		touchspikedetected = false;
+	if (touchspikedetected)
+	{
+		if ((millis() - spikedetecttime) > spikereleasetime) {
+			touchspikedetected = false;
+		}
 	}
+
 
 	if (samplecounter < testsignalsize) {
 		prevsignalsample = samplevalues[samplecounter];
 		samplevalues[samplecounter] = value;
-		fillhumparray(value);
+
 		samplecounter += 1;
 	}
 	if (samplecounter >= testsignalsize) {
 		samplecounter = 0;
 	}
 
-	
+
 
 }
 
 void AdvCapTouch::fillhumparray(float samplevalue) {
-	if (humpsamplecounter < humpsignalsize) {
-		prevhumpsample = humpsamplevalues[humpsamplecounter];
-		humpsamplevalues[humpsamplecounter] = samplevalue;
-		humpsamplecounter += 1;
-	}
-	if (humpsamplecounter >= humpsignalsize) {
-		humpsamplecounter = 0;
-	}
-	
+
 }
 
 void AdvCapTouch::set_capTouchPins(int sp, int rp0, int rp1, int rp2, int rp3) {  //sets the arduino pins used for the capacitive touch detection (sendpin, receivepin1, receivepin2, receivepin3, receivepin4)
@@ -272,27 +284,33 @@ void AdvCapTouch::set_capTouchPins(int sp, int rp0, int rp1, int rp2, int rp3) {
 
 int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection function
 
-	if (detectionstate == 0) {
+	if (detectionstate == -10)
+	{
 		read_valueFromNoise(padnum);
-		if (checkTouch(padnum) == true) {
-			for (int i = 0; i < debounce; i++) { //debounce
-				read_valueFromNoise(padnum);
-			}
-			read_valueFromNoise(padnum);
-			if (checkTouch(padnum) == true) {   //check again
+		if (debounce < millis() - time_touched)
+		{
+			if (checkTouch(padnum) == true)
+			{
 				haptics(1);   //turn on viberation motor to acknowledge touch
 				input_type = 1;   //set input type as single tap but proceed to check for second touch
 				detectionstate = 1;
-				treshmean = mean;
+				treshbasevalue = basevalue[padnum];
 				time_touched = millis();
+				startWith_interrupt = false;
 				//changevalue[padnum] += detectionThreshold[padnum];
 			}
+		}
+	}
+	if (detectionstate == 0) {
+		read_valueFromNoise(padnum);
+		if (checkTouch(padnum) == true) {
+			detectionstate = -10;
 		}
 	}
 	else if (detectionstate == 1) {
 		read_valueFromNoise(padnum);
 		if (checkTouch(padnum) == true) {   //check again
-			
+
 			long temptime = (millis() - time_touched);
 			if (temptime < 4000) {
 				haptics(0);
@@ -319,7 +337,7 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 					extralongpresshaptics = true;
 				}
 				if (checkRelease(padnum)) {
-					
+
 					returntouchtype = true;
 					haptics(0);
 				}
@@ -383,6 +401,8 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 		tempdetectedinput = input_type;
 		update_basevalueFromNoise(padnum);
 		//Serial.println((millis() - time_touched));
+		startWith_interrupt = true;
+		
 		return tempdetectedinput;
 	}
 	else {
@@ -403,7 +423,7 @@ int AdvCapTouch::detect_touchFromNoise(int padnum) {  //touch type detection fun
 
 
 int AdvCapTouch::detect_touchFromNoise_single(int padnum) {  //single tap detection function
-	
+
 }
 
 float AdvCapTouch::read_value(int padnum) {
@@ -423,24 +443,35 @@ float AdvCapTouch::read_value(int padnum) {
 }
 
 bool AdvCapTouch::standarddeviationtest(float testsample) {
-	
-	
+
+
 	SDs_away = (testsample - mean) / standarddeviation;
-	
-	if (SDs_away > 15)
+
+	//SerialUSB.print(testsample);
+	//SerialUSB.print("\t");
+	//SerialUSB.print(changevalue[0]);
+	//SerialUSB.print("\t");
+	//SerialUSB.print(basevalue[0]);
+	//SerialUSB.print("\t");
+	//SerialUSB.println(SDs_away);
+
+	if (SDs_away > 400)
 	{
+
 		if (!touchspikedetected)
 		{
 			//SerialUSB.print(standarddeviation);
 			//SerialUSB.print("\t");
 			//SerialUSB.println(SDs_away);
 			//delay(50);
+
+
 			touchspikedetected = true;
-			touchspikesampleposition = samplecounter;
+			spikedetecttime = millis();
 		}
-		
+
 	}
-    
+
 	return true;
 }
 
@@ -448,49 +479,63 @@ bool AdvCapTouch::standarddeviationtest(float testsample) {
 float AdvCapTouch::read_valueFromNoise(int padnum) {   //returns only peak value from a small sample of the signal
 
 	float rate = capvalueupdate_rate;  //cap value change rate
+	
+	if (!interruptValue_aquisition || !startWith_interrupt)
+	{
+		if (padnum == 0) {
+			tempread = pad0.capacitiveSensor(speed_noise);
+			if (tempread < (basevalue[padnum] + maxtouchrange))
+			{
 
-	if (padnum == 0) {
-		tempread = pad0.capacitiveSensor(speed_noise);
-		
-		//set  the changevalue(damping drastic changes)
-		
-		if (changevalue[padnum] > tempread) {
-			//rate = 10/(changevalue[padnum] - tempread);
-			
-			changevalue[padnum] -= ((changevalue[padnum] - tempread) * rate);
-			
-		}
-		else if (changevalue[padnum] < tempread) {
-			//rate = 10/ (tempread - changevalue[padnum]);
-			
-			changevalue[padnum] += ((tempread - changevalue[padnum]) * rate);
-			
-		}
-		standarddeviationtest(tempread);
-		/*
-		SerialUSB.print(tempread);
-		SerialUSB.print("\t");
-		SerialUSB.print(changevalue[padnum]);
-		SerialUSB.print("\t");
-		SerialUSB.println(rate);
-		*/
-		
+				//set  the changevalue(damping drastic changes)
 
+				changevalue[padnum] = (tempread + (changevalue[padnum] * rate)) / (rate + 1);
+				//basevalue[padnum] = (tempread + (basevalue[padnum] * 150)) / (150 + 1);
+				addSample(padnum, tempread);
+
+				//standarddeviationtest(changevalue[padnum]);
+				//getmean();
+				//getstandarddeviation();
+				//SerialUSB.println("accepted/////////////////");
+			}
+			else {
+				addSample(padnum, tempread);
+				//SerialUSB.println("rejected/////////////////");
+				if (!touchspikedetected)
+				{
+					//SerialUSB.print(standarddeviation);
+					//SerialUSB.print("\t");
+					//SerialUSB.println("rejected...............");
+					//delay(50);
+
+
+					touchspikedetected = true;
+					spikedetecttime = millis();
+				}
+			}
+
+
+		}
+		//SerialUSB.print("continued in loop");
+		//SerialUSB.print("\t");
+		//SerialUSB.print(basevalue[0]);
+		//SerialUSB.print("\t");
+		//SerialUSB.println(changevalue[padnum]);
+		
+		
 	}
-
+	
 	//SerialUSB.print(basevalue[0]);
-	//SerialUSB.print("\t");
-	//SerialUSB.println(changevalue[padnum]);
-	addSample(padnum, changevalue[padnum]);
-	getmean();
-	getstandarddeviation();
+		//SerialUSB.print("\t");
+		//SerialUSB.println(changevalue[padnum]);
 
 	
+
 
 	//getmedian();
 	return changevalue[padnum];
 
-	
+
 }
 
 
@@ -507,12 +552,12 @@ void AdvCapTouch::update_basevalueFromNoise(int padnum) {  // keeps both the bas
 
 void AdvCapTouch::update_basevalueSmooth(int padnum) {   //Function to gradually update basevalue
 	//
-	
-		//tempread = pad0.capacitiveSensor(speed_noise);    // save a small sample to the sample array
-		
 
-	if (samplecounter == (testsignalsize-1)) { //find new max and min values
-		
+		//tempread = pad0.capacitiveSensor(speed_noise);    // save a small sample to the sample array
+
+
+	if (samplecounter == (testsignalsize - 1)) { //find new max and min values
+
 		maxsample[padnum] = 0;
 		minsample[padnum] = 9999999;
 		for (int i = 0; i < testsignalsize; i++) {
@@ -523,9 +568,9 @@ void AdvCapTouch::update_basevalueSmooth(int padnum) {   //Function to gradually
 				if (samplevalues[i] < minsample[padnum]) {
 					minsample[padnum] = samplevalues[i];
 				}
-				
+
 			}
-			
+
 		}
 		//update touch thresholds (adaptive touch sensitivity)
 		if (adaptsensitivity == true) {
@@ -541,7 +586,7 @@ void AdvCapTouch::resetvalues() {
 	if (detectionstate == 0) {
 		input_type = 0;
 	}
-	
+
 }
 
 void AdvCapTouch::set_haptics(int pin, int duration, int strength) {  //use to set haptics variables (arduino pwm pin, duration of haptics(ms), strength from 0-255)
@@ -565,7 +610,7 @@ void AdvCapTouch::haptics(int state) {  //function for viberation feedback
 			analogWrite(haptics_pin, 0);
 			haptics_state = 0;
 		}
-		
+
 	}
 	/*
 	analogWrite(haptics_pin, haptics_strength);
@@ -581,7 +626,7 @@ void AdvCapTouch::show_levels(int padnum) {
 
 	//read_valueFromNoise(padnum);
 	//getmean();
-	detect_touchFromNoise(padnum);
+	//detect_touchFromNoise(padnum);
 	//SerialUSB.print(changevalue[padnum]);
 	//SerialUSB.print("\t");
 	//SerialUSB.println(standarddeviation);
@@ -593,9 +638,9 @@ void AdvCapTouch::show_levels(int padnum) {
 	SerialUSB.print("\t");
 	SerialUSB.println(changevalue[padnum]);
 	*/
-	
+	//SerialUSB.println(pad0.capacitiveSensor(speed_noise));
 	//delay(50);
-	
+
 }
 
 
