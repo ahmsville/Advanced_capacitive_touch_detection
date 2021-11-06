@@ -33,11 +33,11 @@ private:
 
 
 	int input_type, tempdetectedinput;
-	int floatclickspeed, singletaptresh, samplecounter = 0, humpsamplecounter = 0, speed_noise = 3, speed_normal = speed_noise;
+	int floatclickspeed, singletaptresh, samplecounter = 0, humpsamplecounter = 0, speed_noise = 3, speed_normal = 3;
 	int shortpressthresh, longpressthresh;
 	int haptics_pin = 0, haptics_duration = 0, haptics_strength = 0, haptics_ontime, haptics_offtime, haptics_state;
 
-	long spikereleasetime = 1000, spikedetecttime = 0, debounce = 50;
+	long spikereleasetime = 1000, spikedetecttime = 0, debounce = 5;
 
 	bool touchspikedetected = false;
 	bool interruptValue_aquisition = false;
@@ -50,7 +50,7 @@ private:
 	float prevsignalsample = 0, prevhumpsample = 0;
 
 	int detectionstate = 0;
-	long time_touched = 0;
+	long time_touched = 0, master_time_touched = 0;;
 	bool returntouchtype = false;
 	bool floatclick, adaptsensitivity = false;
 	int testsignalsize = 30;
@@ -62,9 +62,9 @@ private:
 	bool longpresshaptics = false, shortpresshaptics = false, extralongpresshaptics = false;
 	float tempread;
 
-	float S_alpha = 0.2, S_alpha2 = 0.001, smallvaluerange = 10, diff = 0;
+	float S_alpha = 0.4, S_alpha2 = 0.001, smallvaluerange = 15, diff = 0;
 
-
+	int tempdiff = 0;
 
 	bool repopulating = false;
 	bool startWith_interrupt = true;
